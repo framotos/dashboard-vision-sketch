@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/dashboard/Header';
 import Navigation from '@/components/dashboard/Navigation';
 import MonthSelector from '@/components/dashboard/MonthSelector';
@@ -14,63 +14,109 @@ const Index = () => {
   const [selectedMonth, setSelectedMonth] = useState('Juli 2024');
   const [activeGroup, setActiveGroup] = useState(1);
   
-  const conflicts = [
-    {
-      id: 1,
-      name: 'Hannah Keuerhof',
-      message: 'Irgendwas, dass Andi hier schreiben würde.',
-      resolved: false
-    },
-    {
-      id: 2,
-      name: 'Elisa Braun',
-      message: 'Noch etwas, dass er schreiben würde',
-      resolved: false
+  // Create empty data structures for all possible months and groups
+  const [conflicts, setConflicts] = useState<{
+    [month: string]: {
+      [group: number]: Array<{id: number, name: string, message: string, resolved: boolean}>
     }
-  ];
+  }>({});
   
-  const documents = [
-    {
-      id: '1',
-      name: 'Probeabrechnung.pdf',
-      category: 'preliminary'
-    },
-    {
-      id: '2',
-      name: 'Monats_Berichterstellung.pdf',
-      category: 'other'
-    },
-    {
-      id: '3',
-      name: 'Mandanten-Benachrichtigungen.pdf',
-      category: 'other'
-    },
-    {
-      id: '4',
-      name: 'ZV-Ausgabe.pdf',
-      category: 'other'
-    },
-    {
-      id: '5',
-      name: 'ZV-Ausgabe.pdf',
-      category: 'other'
+  const [documents, setDocuments] = useState<{
+    [month: string]: {
+      [group: number]: Array<{id: string, name: string, category: string}>
     }
-  ];
+  }>({});
   
-  const approvals = [
-    {
-      id: 1,
-      type: 'Probeabrechnung',
-      timestamp: '30.04.23, 16:32 Uhr',
-      status: 'approved' as const
-    },
-    {
-      id: 2,
-      type: 'Finale Abrechnung',
-      timestamp: null,
-      status: 'open' as const
+  const [approvals, setApprovals] = useState<{
+    [month: string]: {
+      [group: number]: Array<{id: number, type: string, timestamp: string | null, status: 'approved' | 'open'}>
     }
-  ];
+  }>({});
+  
+  // Initialize with sample data for the current month and group
+  useEffect(() => {
+    // Sample data for July 2024, Group 1
+    setConflicts({
+      'Juli 2024': {
+        1: [
+          {
+            id: 1,
+            name: 'Hannah Keuerhof',
+            message: 'Irgendwas, dass Andi hier schreiben würde.',
+            resolved: false
+          },
+          {
+            id: 2,
+            name: 'Elisa Braun',
+            message: 'Noch etwas, dass er schreiben würde',
+            resolved: false
+          }
+        ],
+        2: [],
+        3: []
+      }
+    });
+    
+    setDocuments({
+      'Juli 2024': {
+        1: [
+          {
+            id: '1',
+            name: 'Probeabrechnung.pdf',
+            category: 'preliminary'
+          },
+          {
+            id: '2',
+            name: 'Monats_Berichterstellung.pdf',
+            category: 'other'
+          },
+          {
+            id: '3',
+            name: 'Mandanten-Benachrichtigungen.pdf',
+            category: 'other'
+          },
+          {
+            id: '4',
+            name: 'ZV-Ausgabe.pdf',
+            category: 'other'
+          },
+          {
+            id: '5',
+            name: 'ZV-Ausgabe.pdf',
+            category: 'other'
+          }
+        ],
+        2: [],
+        3: []
+      }
+    });
+    
+    setApprovals({
+      'Juli 2024': {
+        1: [
+          {
+            id: 1,
+            type: 'Probeabrechnung',
+            timestamp: '30.04.23, 16:32 Uhr',
+            status: 'approved' as const
+          },
+          {
+            id: 2,
+            type: 'Finale Abrechnung',
+            timestamp: null,
+            status: 'open' as const
+          }
+        ],
+        2: [],
+        3: []
+      }
+    });
+  }, []);
+  
+  // Get the data for the current selection
+  const currentConflicts = conflicts[selectedMonth]?.[activeGroup] || [];
+  const currentDocuments = documents[selectedMonth]?.[activeGroup] || [];
+  const currentApprovals = approvals[selectedMonth]?.[activeGroup] || [];
   
   return (
     <div className="min-h-screen bg-gray-100">
@@ -108,15 +154,15 @@ const Index = () => {
           />
           
           <Conflicts 
-            initialConflicts={conflicts} 
+            initialConflicts={currentConflicts} 
           />
           
           <DocumentUploads 
-            initialDocuments={documents} 
+            initialDocuments={currentDocuments} 
           />
           
           <Approvals 
-            approvals={approvals} 
+            approvals={currentApprovals} 
           />
         </div>
       </main>

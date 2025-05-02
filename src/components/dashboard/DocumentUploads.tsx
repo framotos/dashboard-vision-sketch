@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface Document {
   id: string;
@@ -14,6 +16,7 @@ interface DocumentUploadsProps {
 
 const DocumentUploads: React.FC<DocumentUploadsProps> = ({ initialDocuments }) => {
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);
+  const [isOpen, setIsOpen] = useState(true);
   
   const removeDocument = (id: string) => {
     setDocuments(documents.filter(doc => doc.id !== id));
@@ -65,43 +68,60 @@ const DocumentUploads: React.FC<DocumentUploadsProps> = ({ initialDocuments }) =
   };
   
   return (
-    <div className="bg-white p-5 rounded-lg mb-6">
-      <h2 className="text-lg font-medium mb-4">Dokumentenuploads</h2>
-      
-      {renderCategoryDocuments('preliminary', 'Probeabrechnung')}
-      {renderCategoryDocuments('final', 'Finale Abrechnung')}
-      {renderCategoryDocuments('transfer', 'Überweisungsvorlage')}
-      
-      <div className="mb-5">
-        <h3 className="text-sm font-medium mb-2">Weitere Dokumente</h3>
-        <div className="space-y-2">
-          {documents
-            .filter(doc => doc.category === 'other')
-            .map(doc => (
-              <div 
-                key={doc.id}
-                className="flex items-center gap-2 bg-blue-50 text-blue-800 rounded-md p-2 text-sm"
-              >
-                <span className="flex-1">{doc.name}</span>
-                <button 
-                  onClick={() => removeDocument(doc.id)}
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            ))}
-        </div>
-        
-        <div
-          className="mt-2 border-2 border-dashed border-gray-300 rounded-md p-4 text-center cursor-pointer text-sm text-gray-500 hover:border-gray-400 transition-colors"
-          onDrop={(e) => handleDrop(e, 'other')}
-          onDragOver={handleDragOver}
-        >
-          hochladen oder reinziehen
-        </div>
+    <Collapsible
+      open={isOpen}
+      onOpenChange={setIsOpen}
+      className="bg-white p-5 rounded-lg mb-6"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-medium">Dokumentenuploads</h2>
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" size="sm" className="w-9 p-0">
+            {isOpen ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+        </CollapsibleTrigger>
       </div>
-    </div>
+      
+      <CollapsibleContent>
+        {renderCategoryDocuments('preliminary', 'Probeabrechnung')}
+        {renderCategoryDocuments('final', 'Finale Abrechnung')}
+        {renderCategoryDocuments('transfer', 'Überweisungsvorlage')}
+        
+        <div className="mb-5">
+          <h3 className="text-sm font-medium mb-2">Weitere Dokumente</h3>
+          <div className="space-y-2">
+            {documents
+              .filter(doc => doc.category === 'other')
+              .map(doc => (
+                <div 
+                  key={doc.id}
+                  className="flex items-center gap-2 bg-blue-50 text-blue-800 rounded-md p-2 text-sm"
+                >
+                  <span className="flex-1">{doc.name}</span>
+                  <button 
+                    onClick={() => removeDocument(doc.id)}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+          </div>
+          
+          <div
+            className="mt-2 border-2 border-dashed border-gray-300 rounded-md p-4 text-center cursor-pointer text-sm text-gray-500 hover:border-gray-400 transition-colors"
+            onDrop={(e) => handleDrop(e, 'other')}
+            onDragOver={handleDragOver}
+          >
+            hochladen oder reinziehen
+          </div>
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 };
 

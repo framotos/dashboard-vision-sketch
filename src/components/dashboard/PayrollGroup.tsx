@@ -14,9 +14,9 @@ const PayrollGroup: React.FC<PayrollGroupProps> = ({
 }) => {
   return (
     <div 
-      className={`flex-1 py-2.5 px-4 text-center ${
+      className={`flex-1 py-2.5 px-4 text-center transition-all duration-200 ${
         isActive 
-          ? 'bg-white' 
+          ? 'bg-white shadow-sm' 
           : 'bg-payroll-lightgray hover:bg-gray-100 cursor-pointer'
       }`}
       onClick={onClick}

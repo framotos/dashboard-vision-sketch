@@ -1,13 +1,15 @@
 
-import React from 'react';
-import { ChevronDown } from 'lucide-react';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
+import React, { useState } from 'react';
+import { format } from 'date-fns';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface MonthSelectorProps {
   selectedMonth: string;
@@ -15,35 +17,42 @@ interface MonthSelectorProps {
 }
 
 const MonthSelector: React.FC<MonthSelectorProps> = ({ selectedMonth, onMonthChange }) => {
-  const months = [
-    'Januar 2024',
-    'Februar 2024',
-    'März 2024',
-    'April 2024',
-    'Mai 2024',
-    'Juni 2024',
-    'Juli 2024',
-    'August 2024',
-    'September 2024',
-    'Oktober 2024',
-    'November 2024',
-    'Dezember 2024',
-  ];
+  const [date, setDate] = useState<Date | undefined>(new Date());
+
+  const handleSelect = (selectedDate: Date | undefined) => {
+    if (selectedDate) {
+      setDate(selectedDate);
+      // Format the date to show only month and year
+      const formattedMonth = format(selectedDate, 'MMMM yyyy');
+      onMonthChange(formattedMonth);
+    }
+  };
 
   return (
     <div className="px-6 py-4">
-      <Select value={selectedMonth} onValueChange={onMonthChange}>
-        <SelectTrigger className="w-40">
-          <SelectValue placeholder={selectedMonth} />
-        </SelectTrigger>
-        <SelectContent>
-          {months.map((month) => (
-            <SelectItem key={month} value={month}>
-              {month}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className={cn(
+              "w-[200px] justify-start text-left font-normal",
+              !date && "text-muted-foreground"
+            )}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {selectedMonth}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="month"
+            selected={date}
+            onSelect={handleSelect}
+            initialFocus
+            className={cn("p-3 pointer-events-auto")}
+          />
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };

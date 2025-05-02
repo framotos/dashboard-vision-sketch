@@ -12,7 +12,10 @@ const Header: React.FC<HeaderProps> = ({ companyName }) => {
       <div className="flex items-center space-x-2">
         <span className="font-semibold text-payroll-gray">Ordio Payroll Plus</span>
         <span className="text-gray-400 mx-1">&gt;</span>
-        <span className="font-semibold">{companyName}</span>
+        <div className="flex items-center">
+          <span className="font-semibold">{companyName}</span>
+          <ChevronDown className="ml-1 h-4 w-4 text-gray-500" />
+        </div>
       </div>
     </div>
   );
