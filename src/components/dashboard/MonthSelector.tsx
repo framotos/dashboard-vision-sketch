@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-import { format } from 'date-fns';
-import { Calendar as CalendarIcon } from 'lucide-react';
-import { Calendar } from '@/components/ui/calendar';
+
+import React from 'react';
+import { ChevronDown } from 'lucide-react';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface MonthSelectorProps {
   selectedMonth: string;
@@ -16,52 +15,44 @@ interface MonthSelectorProps {
 }
 
 const MonthSelector: React.FC<MonthSelectorProps> = ({ selectedMonth, onMonthChange }) => {
-  const [date, setDate] = useState<Date | undefined>(new Date());
-
-  const handleSelect = (selectedDate: Date | undefined) => {
-    if (selectedDate) {
-      setDate(selectedDate);
-      // Format the date to show only month and year
-      const formattedMonth = format(selectedDate, 'MMMM yyyy');
-      onMonthChange(formattedMonth);
-    }
-  };
+  // Available months for selection
+  const months = [
+    'Januar 2024',
+    'Februar 2024',
+    'März 2024',
+    'April 2024',
+    'Mai 2024',
+    'Juni 2024',
+    'Juli 2024',
+    'August 2024',
+    'September 2024',
+    'Oktober 2024',
+    'November 2024',
+    'Dezember 2024',
+    'Januar 2025',
+    'Februar 2025',
+    'März 2025',
+    'April 2025',
+    'Mai 2025',
+    'Juni 2025',
+  ];
 
   return (
     <div className="px-6 py-4">
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className={cn(
-              "w-[200px] justify-start text-left font-normal",
-              !date && "text-muted-foreground"
-            )}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
+      <Select value={selectedMonth} onValueChange={onMonthChange}>
+        <SelectTrigger className="w-[200px]">
+          <SelectValue placeholder="Monat auswählen">
             {selectedMonth}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={handleSelect}
-            initialFocus
-            className={cn("p-3 pointer-events-auto")}
-            captionLayout="dropdown-buttons"
-            fromYear={2023}
-            toYear={2026}
-            showOutsideDays={false}
-            ISOWeek={false}
-            disabled={(date) => {
-              // Disable specific dates, only allow selecting full months
-              // This effectively makes it a month selector while keeping the "single" mode
-              return date.getDate() !== 1;
-            }}
-          />
-        </PopoverContent>
-      </Popover>
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          {months.map((month) => (
+            <SelectItem key={month} value={month}>
+              {month}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 };

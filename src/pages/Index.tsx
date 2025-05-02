@@ -14,246 +14,190 @@ const Index = () => {
   const [selectedMonth, setSelectedMonth] = useState('Juli 2024');
   const [activeGroup, setActiveGroup] = useState(1);
   
-  // Create empty data structures for all possible months and groups
-  const [conflicts, setConflicts] = useState<{
-    [month: string]: {
-      [group: number]: Array<{id: number, name: string, message: string, resolved: boolean}>
-    }
+  // Create a unique key for current selection to render unique components
+  const currentKey = `${selectedMonth}-${activeGroup}`;
+  
+  // Data structures to store information for all combinations of month and group
+  const [conflictsData, setConflictsData] = useState<{
+    [key: string]: Array<{id: number, name: string, message: string, resolved: boolean}>
   }>({});
   
-  const [documents, setDocuments] = useState<{
-    [month: string]: {
-      [group: number]: Array<{id: string, name: string, category: string}>
-    }
+  const [documentsData, setDocumentsData] = useState<{
+    [key: string]: Array<{id: string, name: string, category: string}>
   }>({});
   
-  const [approvals, setApprovals] = useState<{
-    [month: string]: {
-      [group: number]: Array<{id: number, type: string, timestamp: string | null, status: 'approved' | 'open'}>
-    }
+  const [approvalsData, setApprovalsData] = useState<{
+    [key: string]: Array<{id: number, type: string, timestamp: string | null, status: 'approved' | 'open'}>
   }>({});
   
-  // Initialize with sample data for the current month and group
+  // Initialize with sample data
   useEffect(() => {
-    // Sample data for July 2024, Group 1
-    setConflicts({
-      'Juli 2024': {
-        1: [
-          {
-            id: 1,
-            name: 'Hannah Keuerhof',
-            message: 'Irgendwas, dass Andi hier schreiben würde.',
-            resolved: false
-          },
-          {
-            id: 2,
-            name: 'Elisa Braun',
-            message: 'Noch etwas, dass er schreiben würde',
-            resolved: false
-          }
-        ],
-        2: [],
-        3: []
-      },
-      'Mai 2025': {
-        1: [
-          {
-            id: 1,
-            name: 'Max Mustermann',
-            message: 'Fehlerhafte Stundenkalkulation im Monat Mai',
-            resolved: false
-          },
-          {
-            id: 2,
-            name: 'Julia Schmidt',
-            message: 'Fehlende Überstundenpauschale',
-            resolved: false
-          },
-          {
-            id: 3,
-            name: 'Tobias Wagner',
-            message: 'Kranktage wurden nicht korrekt erfasst',
-            resolved: true
-          },
-          {
-            id: 4,
-            name: 'Lena Fischer',
-            message: 'Urlaubstage stimmen nicht mit Planung überein',
-            resolved: false
-          },
-        ],
-        2: [
-          {
-            id: 5,
-            name: 'Felix Meyer',
-            message: 'Zuschläge für Wochenendarbeit fehlen',
-            resolved: false
-          }
-        ],
-        3: [
-          {
-            id: 6,
-            name: 'Nina Hoffmann',
-            message: 'Steuerklasse wurde nicht korrekt aktualisiert',
-            resolved: true
-          }
-        ]
-      }
-    });
+    // Sample conflicts data for Mai 2025
+    setConflictsData(prevData => ({
+      ...prevData,
+      'Mai 2025-1': [
+        {
+          id: 1,
+          name: 'Max Mustermann',
+          message: 'Fehlerhafte Stundenkalkulation im Monat Mai',
+          resolved: false
+        },
+        {
+          id: 2,
+          name: 'Julia Schmidt',
+          message: 'Fehlende Überstundenpauschale',
+          resolved: false
+        },
+        {
+          id: 3,
+          name: 'Tobias Wagner',
+          message: 'Kranktage wurden nicht korrekt erfasst',
+          resolved: true
+        },
+        {
+          id: 4,
+          name: 'Lena Fischer',
+          message: 'Urlaubstage stimmen nicht mit Planung überein',
+          resolved: false
+        },
+      ],
+      'Mai 2025-2': [
+        {
+          id: 5,
+          name: 'Felix Meyer',
+          message: 'Zuschläge für Wochenendarbeit fehlen',
+          resolved: false
+        }
+      ],
+      'Mai 2025-3': [
+        {
+          id: 6,
+          name: 'Nina Hoffmann',
+          message: 'Steuerklasse wurde nicht korrekt aktualisiert',
+          resolved: true
+        }
+      ]
+    }));
     
-    setDocuments({
-      'Juli 2024': {
-        1: [
-          {
-            id: '1',
-            name: 'Probeabrechnung.pdf',
-            category: 'preliminary'
-          },
-          {
-            id: '2',
-            name: 'Monats_Berichterstellung.pdf',
-            category: 'other'
-          },
-          {
-            id: '3',
-            name: 'Mandanten-Benachrichtigungen.pdf',
-            category: 'other'
-          },
-          {
-            id: '4',
-            name: 'ZV-Ausgabe.pdf',
-            category: 'other'
-          },
-          {
-            id: '5',
-            name: 'ZV-Ausgabe.pdf',
-            category: 'other'
-          }
-        ],
-        2: [],
-        3: []
-      },
-      'Mai 2025': {
-        1: [
-          {
-            id: '1',
-            name: 'Probeabrechnung_Mai2025.pdf',
-            category: 'preliminary'
-          },
-          {
-            id: '2',
-            name: 'Finale_Abrechnung_Mai2025.pdf',
-            category: 'final'
-          }
-        ],
-        2: [
-          {
-            id: '3',
-            name: 'Ueberweisung_Mai2025_G2.pdf',
-            category: 'transfer'
-          }
-        ],
-        3: []
-      }
-    });
+    // Sample documents data for Juli 2024
+    setDocumentsData(prevData => ({
+      ...prevData,
+      'Juli 2024-1': [
+        {
+          id: '1',
+          name: 'Probeabrechnung.pdf',
+          category: 'preliminary'
+        },
+        {
+          id: '2',
+          name: 'Monats_Berichterstellung.pdf',
+          category: 'other'
+        }
+      ]
+    }));
     
-    setApprovals({
-      'Juli 2024': {
-        1: [
-          {
-            id: 1,
-            type: 'Probeabrechnung',
-            timestamp: '30.04.23, 16:32 Uhr',
-            status: 'approved' as const
-          },
-          {
-            id: 2,
-            type: 'Finale Abrechnung',
-            timestamp: null,
-            status: 'open' as const
-          }
-        ],
-        2: [],
-        3: []
-      },
-      'Mai 2025': {
-        1: [
-          {
-            id: 1,
-            type: 'Probeabrechnung',
-            timestamp: '28.04.25, 14:15 Uhr',
-            status: 'approved' as const
-          },
-          {
-            id: 2,
-            type: 'Finale Abrechnung',
-            timestamp: '30.04.25, 10:22 Uhr',
-            status: 'approved' as const
-          }
-        ],
-        2: [
-          {
-            id: 3,
-            type: 'Probeabrechnung',
-            timestamp: '28.04.25, 16:45 Uhr',
-            status: 'approved' as const
-          },
-          {
-            id: 4,
-            type: 'Finale Abrechnung',
-            timestamp: null,
-            status: 'open' as const
-          }
-        ],
-        3: [
-          {
-            id: 5,
-            type: 'Probeabrechnung',
-            timestamp: null,
-            status: 'open' as const
-          }
-        ]
-      }
-    });
+    // Sample approvals data for Mai 2025
+    setApprovalsData(prevData => ({
+      ...prevData,
+      'Mai 2025-1': [
+        {
+          id: 1,
+          type: 'Probeabrechnung',
+          timestamp: '28.04.25, 14:15 Uhr',
+          status: 'approved'
+        },
+        {
+          id: 2,
+          type: 'Finale Abrechnung',
+          timestamp: '30.04.25, 10:22 Uhr',
+          status: 'approved'
+        }
+      ],
+      'Mai 2025-2': [
+        {
+          id: 3,
+          type: 'Probeabrechnung',
+          timestamp: '28.04.25, 16:45 Uhr',
+          status: 'approved'
+        },
+        {
+          id: 4,
+          type: 'Finale Abrechnung',
+          timestamp: null,
+          status: 'open'
+        }
+      ],
+      'Mai 2025-3': [
+        {
+          id: 5,
+          type: 'Probeabrechnung',
+          timestamp: null,
+          status: 'open'
+        }
+      ]
+    }));
   }, []);
   
   // Handle adding a new conflict
   const handleAddConflict = (name: string, message: string) => {
-    setConflicts(prevConflicts => {
-      // Make sure the month and group exist
-      const updatedConflicts = { ...prevConflicts };
-      if (!updatedConflicts[selectedMonth]) {
-        updatedConflicts[selectedMonth] = {};
-      }
-      if (!updatedConflicts[selectedMonth][activeGroup]) {
-        updatedConflicts[selectedMonth][activeGroup] = [];
-      }
-      
-      // Find the next ID
-      const currentConflicts = updatedConflicts[selectedMonth][activeGroup];
+    setConflictsData(prevData => {
+      const currentConflicts = prevData[currentKey] || [];
       const nextId = currentConflicts.length > 0 
         ? Math.max(...currentConflicts.map(c => c.id)) + 1 
         : 1;
       
-      // Add the new conflict
-      updatedConflicts[selectedMonth][activeGroup] = [
-        ...currentConflicts,
-        {
-          id: nextId,
-          name,
-          message,
-          resolved: false
-        }
-      ];
-      
-      return updatedConflicts;
+      return {
+        ...prevData,
+        [currentKey]: [
+          ...currentConflicts,
+          {
+            id: nextId,
+            name,
+            message,
+            resolved: false
+          }
+        ]
+      };
     });
   };
   
-  // Get the data for the current selection
-  const currentConflicts = conflicts[selectedMonth]?.[activeGroup] || [];
-  const currentDocuments = documents[selectedMonth]?.[activeGroup] || [];
-  const currentApprovals = approvals[selectedMonth]?.[activeGroup] || [];
+  // Handle document upload
+  const handleDocumentUpload = (newDocuments: Array<{id: string, name: string, category: string}>) => {
+    setDocumentsData(prevData => {
+      const currentDocs = prevData[currentKey] || [];
+      
+      return {
+        ...prevData,
+        [currentKey]: [...currentDocs, ...newDocuments]
+      };
+    });
+  };
+  
+  // Handle approval status change
+  const handleApprovalStatusChange = (id: number, status: 'approved' | 'open') => {
+    setApprovalsData(prevData => {
+      const currentApprovals = [...(prevData[currentKey] || [])];
+      const approvalIndex = currentApprovals.findIndex(a => a.id === id);
+      
+      if (approvalIndex >= 0) {
+        currentApprovals[approvalIndex] = {
+          ...currentApprovals[approvalIndex],
+          status,
+          timestamp: status === 'approved' ? new Date().toLocaleString('de-DE') : null
+        };
+      }
+      
+      return {
+        ...prevData,
+        [currentKey]: currentApprovals
+      };
+    });
+  };
+  
+  // Get the current data for the selected month and group
+  const currentConflicts = conflictsData[currentKey] || [];
+  const currentDocuments = documentsData[currentKey] || [];
+  const currentApprovals = approvalsData[currentKey] || [];
   
   return (
     <div className="min-h-screen bg-gray-100">
@@ -286,21 +230,27 @@ const Index = () => {
           </div>
           
           <Exports 
+            key={`exports-${currentKey}`}
             monthLabel={selectedMonth} 
             groupNumber={activeGroup} 
           />
           
           <Conflicts 
+            key={`conflicts-${currentKey}`}
             initialConflicts={currentConflicts}
             onConflictAdd={({name, message}) => handleAddConflict(name, message)}
           />
           
           <DocumentUploads 
-            initialDocuments={currentDocuments} 
+            key={`documents-${currentKey}`}
+            initialDocuments={currentDocuments}
+            onDocumentsUpload={handleDocumentUpload}
           />
           
           <Approvals 
-            approvals={currentApprovals} 
+            key={`approvals-${currentKey}`}
+            approvals={currentApprovals}
+            onApprovalStatusChange={handleApprovalStatusChange}
           />
         </div>
       </main>

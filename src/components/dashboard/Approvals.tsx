@@ -13,10 +13,19 @@ interface ApprovalItem {
 
 interface ApprovalsProps {
   approvals: ApprovalItem[];
+  onApprovalStatusChange?: (id: number, status: 'approved' | 'open') => void;
 }
 
-const Approvals: React.FC<ApprovalsProps> = ({ approvals }) => {
+const Approvals: React.FC<ApprovalsProps> = ({ approvals, onApprovalStatusChange }) => {
   const [isOpen, setIsOpen] = useState(true);
+  
+  const handleStatusChange = (approval: ApprovalItem) => {
+    if (onApprovalStatusChange) {
+      // Toggle the status
+      const newStatus = approval.status === 'open' ? 'approved' : 'open';
+      onApprovalStatusChange(approval.id, newStatus);
+    }
+  };
   
   return (
     <Collapsible
@@ -53,15 +62,16 @@ const Approvals: React.FC<ApprovalsProps> = ({ approvals }) => {
               {approval.timestamp || '-'}
             </div>
             <div className="col-span-3 text-right">
-              {approval.status === 'approved' ? (
-                <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700">
-                  freigegeben
-                </span>
-              ) : (
-                <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
-                  offen
-                </span>
-              )}
+              <button 
+                className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                  approval.status === 'approved' 
+                    ? 'bg-green-50 text-green-700' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                onClick={() => handleStatusChange(approval)}
+              >
+                {approval.status === 'approved' ? 'freigegeben' : 'offen'}
+              </button>
             </div>
           </div>
         ))}

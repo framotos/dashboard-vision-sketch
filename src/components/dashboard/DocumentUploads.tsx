@@ -12,9 +12,10 @@ interface Document {
 
 interface DocumentUploadsProps {
   initialDocuments: Document[];
+  onDocumentsUpload?: (documents: Document[]) => void;
 }
 
-const DocumentUploads: React.FC<DocumentUploadsProps> = ({ initialDocuments }) => {
+const DocumentUploads: React.FC<DocumentUploadsProps> = ({ initialDocuments, onDocumentsUpload }) => {
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [isOpen, setIsOpen] = useState(true);
   
@@ -53,7 +54,12 @@ const DocumentUploads: React.FC<DocumentUploadsProps> = ({ initialDocuments }) =
       category
     }));
     
-    setDocuments([...documents, ...newDocs]);
+    const updatedDocs = [...documents, ...newDocs];
+    setDocuments(updatedDocs);
+    
+    if (onDocumentsUpload) {
+      onDocumentsUpload(newDocs);
+    }
   };
   
   const handleUploadClick = (ref: React.RefObject<HTMLInputElement>) => {
