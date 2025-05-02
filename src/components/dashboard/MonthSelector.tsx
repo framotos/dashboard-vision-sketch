@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
@@ -45,11 +44,21 @@ const MonthSelector: React.FC<MonthSelectorProps> = ({ selectedMonth, onMonthCha
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
-            mode="month"
+            mode="single"
             selected={date}
             onSelect={handleSelect}
             initialFocus
             className={cn("p-3 pointer-events-auto")}
+            captionLayout="dropdown-buttons"
+            fromYear={2023}
+            toYear={2026}
+            showOutsideDays={false}
+            ISOWeek={false}
+            disabled={(date) => {
+              // Disable specific dates, only allow selecting full months
+              // This effectively makes it a month selector while keeping the "single" mode
+              return date.getDate() !== 1;
+            }}
           />
         </PopoverContent>
       </Popover>

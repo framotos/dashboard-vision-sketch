@@ -54,6 +54,50 @@ const Index = () => {
         ],
         2: [],
         3: []
+      },
+      'Mai 2025': {
+        1: [
+          {
+            id: 1,
+            name: 'Max Mustermann',
+            message: 'Fehlerhafte Stundenkalkulation im Monat Mai',
+            resolved: false
+          },
+          {
+            id: 2,
+            name: 'Julia Schmidt',
+            message: 'Fehlende Überstundenpauschale',
+            resolved: false
+          },
+          {
+            id: 3,
+            name: 'Tobias Wagner',
+            message: 'Kranktage wurden nicht korrekt erfasst',
+            resolved: true
+          },
+          {
+            id: 4,
+            name: 'Lena Fischer',
+            message: 'Urlaubstage stimmen nicht mit Planung überein',
+            resolved: false
+          },
+        ],
+        2: [
+          {
+            id: 5,
+            name: 'Felix Meyer',
+            message: 'Zuschläge für Wochenendarbeit fehlen',
+            resolved: false
+          }
+        ],
+        3: [
+          {
+            id: 6,
+            name: 'Nina Hoffmann',
+            message: 'Steuerklasse wurde nicht korrekt aktualisiert',
+            resolved: true
+          }
+        ]
       }
     });
     
@@ -88,6 +132,28 @@ const Index = () => {
         ],
         2: [],
         3: []
+      },
+      'Mai 2025': {
+        1: [
+          {
+            id: '1',
+            name: 'Probeabrechnung_Mai2025.pdf',
+            category: 'preliminary'
+          },
+          {
+            id: '2',
+            name: 'Finale_Abrechnung_Mai2025.pdf',
+            category: 'final'
+          }
+        ],
+        2: [
+          {
+            id: '3',
+            name: 'Ueberweisung_Mai2025_G2.pdf',
+            category: 'transfer'
+          }
+        ],
+        3: []
       }
     });
     
@@ -109,9 +175,80 @@ const Index = () => {
         ],
         2: [],
         3: []
+      },
+      'Mai 2025': {
+        1: [
+          {
+            id: 1,
+            type: 'Probeabrechnung',
+            timestamp: '28.04.25, 14:15 Uhr',
+            status: 'approved' as const
+          },
+          {
+            id: 2,
+            type: 'Finale Abrechnung',
+            timestamp: '30.04.25, 10:22 Uhr',
+            status: 'approved' as const
+          }
+        ],
+        2: [
+          {
+            id: 3,
+            type: 'Probeabrechnung',
+            timestamp: '28.04.25, 16:45 Uhr',
+            status: 'approved' as const
+          },
+          {
+            id: 4,
+            type: 'Finale Abrechnung',
+            timestamp: null,
+            status: 'open' as const
+          }
+        ],
+        3: [
+          {
+            id: 5,
+            type: 'Probeabrechnung',
+            timestamp: null,
+            status: 'open' as const
+          }
+        ]
       }
     });
   }, []);
+  
+  // Handle adding a new conflict
+  const handleAddConflict = (name: string, message: string) => {
+    setConflicts(prevConflicts => {
+      // Make sure the month and group exist
+      const updatedConflicts = { ...prevConflicts };
+      if (!updatedConflicts[selectedMonth]) {
+        updatedConflicts[selectedMonth] = {};
+      }
+      if (!updatedConflicts[selectedMonth][activeGroup]) {
+        updatedConflicts[selectedMonth][activeGroup] = [];
+      }
+      
+      // Find the next ID
+      const currentConflicts = updatedConflicts[selectedMonth][activeGroup];
+      const nextId = currentConflicts.length > 0 
+        ? Math.max(...currentConflicts.map(c => c.id)) + 1 
+        : 1;
+      
+      // Add the new conflict
+      updatedConflicts[selectedMonth][activeGroup] = [
+        ...currentConflicts,
+        {
+          id: nextId,
+          name,
+          message,
+          resolved: false
+        }
+      ];
+      
+      return updatedConflicts;
+    });
+  };
   
   // Get the data for the current selection
   const currentConflicts = conflicts[selectedMonth]?.[activeGroup] || [];
@@ -154,7 +291,8 @@ const Index = () => {
           />
           
           <Conflicts 
-            initialConflicts={currentConflicts} 
+            initialConflicts={currentConflicts}
+            onConflictAdd={({name, message}) => handleAddConflict(name, message)}
           />
           
           <DocumentUploads 

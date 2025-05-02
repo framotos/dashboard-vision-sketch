@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { X, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { X, ChevronDown, ChevronUp, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
@@ -18,20 +18,51 @@ const DocumentUploads: React.FC<DocumentUploadsProps> = ({ initialDocuments }) =
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [isOpen, setIsOpen] = useState(true);
   
+  // Create refs for each upload area
+  const preliminaryRef = useRef<HTMLInputElement>(null);
+  const finalRef = useRef<HTMLInputElement>(null);
+  const transferRef = useRef<HTMLInputElement>(null);
+  const otherRef = useRef<HTMLInputElement>(null);
+  
   const removeDocument = (id: string) => {
     setDocuments(documents.filter(doc => doc.id !== id));
   };
   
   const handleDrop = (event: React.DragEvent<HTMLDivElement>, category: string) => {
     event.preventDefault();
-    // In a real application, we would handle file uploads here
+    
+    if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
+      handleFiles(Array.from(event.dataTransfer.files), category);
+    }
   };
   
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
   
-  const renderCategoryDocuments = (category: string, title: string) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, category: string) => {
+    if (event.target.files && event.target.files.length > 0) {
+      handleFiles(Array.from(event.target.files), category);
+    }
+  };
+  
+  const handleFiles = (files: File[], category: string) => {
+    const newDocs = files.map(file => ({
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      name: file.name,
+      category
+    }));
+    
+    setDocuments([...documents, ...newDocs]);
+  };
+  
+  const handleUploadClick = (ref: React.RefObject<HTMLInputElement>) => {
+    if (ref.current) {
+      ref.current.click();
+    }
+  };
+  
+  const renderCategoryDocuments = (category: string, title: string, ref: React.RefObject<HTMLInputElement>) => {
     const categoryDocs = documents.filter(doc => doc.category === category);
     
     return (
@@ -59,8 +90,17 @@ const DocumentUploads: React.FC<DocumentUploadsProps> = ({ initialDocuments }) =
             className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center cursor-pointer text-sm text-gray-500 hover:border-gray-400 transition-colors"
             onDrop={(e) => handleDrop(e, category)}
             onDragOver={handleDragOver}
+            onClick={() => handleUploadClick(ref)}
           >
+            <Upload className="h-4 w-4 mx-auto mb-2" />
             hochladen oder reinziehen
+            <input 
+              type="file"
+              ref={ref}
+              className="hidden"
+              onChange={(e) => handleFileChange(e, category)}
+              multiple
+            />
           </div>
         )}
       </div>
@@ -87,9 +127,9 @@ const DocumentUploads: React.FC<DocumentUploadsProps> = ({ initialDocuments }) =
       </div>
       
       <CollapsibleContent>
-        {renderCategoryDocuments('preliminary', 'Probeabrechnung')}
-        {renderCategoryDocuments('final', 'Finale Abrechnung')}
-        {renderCategoryDocuments('transfer', 'Überweisungsvorlage')}
+        {renderCategoryDocuments('preliminary', 'Probeabrechnung', preliminaryRef)}
+        {renderCategoryDocuments('final', 'Finale Abrechnung', finalRef)}
+        {renderCategoryDocuments('transfer', 'Überweisungsvorlage', transferRef)}
         
         <div className="mb-5">
           <h3 className="text-sm font-medium mb-2">Weitere Dokumente</h3>
@@ -116,8 +156,17 @@ const DocumentUploads: React.FC<DocumentUploadsProps> = ({ initialDocuments }) =
             className="mt-2 border-2 border-dashed border-gray-300 rounded-md p-4 text-center cursor-pointer text-sm text-gray-500 hover:border-gray-400 transition-colors"
             onDrop={(e) => handleDrop(e, 'other')}
             onDragOver={handleDragOver}
+            onClick={() => handleUploadClick(otherRef)}
           >
+            <Upload className="h-4 w-4 mx-auto mb-2" />
             hochladen oder reinziehen
+            <input 
+              type="file"
+              ref={otherRef}
+              className="hidden"
+              onChange={(e) => handleFileChange(e, 'other')}
+              multiple
+            />
           </div>
         </div>
       </CollapsibleContent>

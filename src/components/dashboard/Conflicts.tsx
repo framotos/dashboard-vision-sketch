@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { Plus, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import AddConflictModal from './AddConflictModal';
 
 interface Conflict {
   id: number;
@@ -13,12 +15,14 @@ interface Conflict {
 
 interface ConflictsProps {
   initialConflicts: Conflict[];
+  onConflictAdd?: (conflict: Omit<Conflict, 'id' | 'resolved'>) => void;
 }
 
-const Conflicts: React.FC<ConflictsProps> = ({ initialConflicts }) => {
+const Conflicts: React.FC<ConflictsProps> = ({ initialConflicts, onConflictAdd }) => {
   const [conflicts, setConflicts] = useState<Conflict[]>(initialConflicts);
   const [activeTab, setActiveTab] = useState("open");
   const [isOpen, setIsOpen] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const openConflicts = conflicts.filter(conflict => !conflict.resolved);
   const resolvedConflicts = conflicts.filter(conflict => conflict.resolved);
@@ -29,6 +33,21 @@ const Conflicts: React.FC<ConflictsProps> = ({ initialConflicts }) => {
         ? { ...conflict, resolved: !conflict.resolved }
         : conflict
     ));
+  };
+  
+  const handleAddConflict = (name: string, message: string) => {
+    const newConflict = {
+      id: conflicts.length ? Math.max(...conflicts.map(c => c.id)) + 1 : 1,
+      name,
+      message,
+      resolved: false
+    };
+    
+    setConflicts([...conflicts, newConflict]);
+    
+    if (onConflictAdd) {
+      onConflictAdd({ name, message });
+    }
   };
   
   return (
@@ -83,11 +102,22 @@ const Conflicts: React.FC<ConflictsProps> = ({ initialConflicts }) => {
         </Tabs>
         
         <div className="mt-4 text-center">
-          <Button variant="ghost" size="sm" className="text-payroll-blue flex items-center gap-1">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-payroll-blue flex items-center gap-1"
+            onClick={() => setIsModalOpen(true)}
+          >
             <Plus className="h-4 w-4" />
             Konflikt hinzufügen
           </Button>
         </div>
+        
+        <AddConflictModal 
+          isOpen={isModalOpen}
+          onOpenChange={setIsModalOpen}
+          onAddConflict={handleAddConflict}
+        />
       </CollapsibleContent>
     </Collapsible>
   );
